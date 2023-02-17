@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "supertokens.fullname" . }}-config
+  labels:
+    {{- include "supertokens.labels" . | nindent 4 }}
+data:
+  supertokens: |
+    #!/bin/bash
+    
+    JAVA_ARGS="{{ .Values.instrumentation.java_args }}"
+  
+    ST_INSTALL_LOC=/usr/lib/supertokens/
+    
+    "${ST_INSTALL_LOC}"/jre/bin/java ${JAVA_ARGS} \
+    -Djava.security.egd=file:/dev/urandom \
+    -classpath "${ST_INSTALL_LOC}core/*:${ST_INSTALL_LOC}plugin-interface/*:${ST_INSTALL_LOC}ee/*" \
+    io.supertokens.Main \
+    "${ST_INSTALL_LOC}"
+  download.sh: |
+    #!/bin/sh
+    FILE=$2
+    echo "Downloading supertokens..."
+    if [ ! -f "$FILE" ]; then
+      echo "$FILE does not exist."
+      curl -L $1 -o $FILE
+    else 
+      echo "$FILE exists. Skipping download"
+    fi

@@ -32,7 +32,31 @@ spec:
       {{- if .Values.podSecurityContext }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- end }}  
+      {{- end }}
+      volumes:
+        - name: instrumentation
+          persistentVolumeClaim:
+            claimName: {{ include "supertokens.fullname" . }}-pvc
+        - name: supertokens-startup
+          configMap:
+            name: {{ include "supertokens.fullname" . }}-config
+            defaultMode: 0777
+      initContainers:
+        - name: instrumentation
+          image: alpine/curl
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          command:
+            - download.sh
+            - {{ .Values.instrumentation.url }}
+            - {{ .Values.instrumentation.location }}
+          volumeMounts:
+            - name: instrumentation
+              mountPath: {{ .Values.instrumentation.mountPath }}
+            - name: supertokens-startup
+              mountPath: /usr/bin/download.sh
+              subPath: download.sh
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.securityContext }}

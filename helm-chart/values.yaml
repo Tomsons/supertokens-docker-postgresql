@@ -4,6 +4,15 @@ image:
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: "3.14"
 
+instrumentation:
+  url: https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+  location: /supertokens/opentelemetry-javaagent.jar
+  mountPath: /supertokens
+  jdk_url: https://download.java.net/java/GA/jdk15.0.1/51f4f36ad4ef43e39d0dfdbaf6549e32/9/GPL/openjdk-15.0.1_linux-aarch64_bin.tar.gz
+  jdk_version: 15.0.1
+  java_args: "-javaagent:/supertokens/opentelemetry-javaagent.jar -Dotel.traces.exporter=jaeger -Dotel.service.name=supertokens -Dotel.exporter.jaeger.endpoint=http://infrastructure-jaeger-operator-jaeger-collector:14250"
+  force_jdk_download: false
+
 replicaCount: 1
 imagePullSecrets: []
 nameOverride: ""
